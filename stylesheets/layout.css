@@ -11,7 +11,7 @@ body {
   font-size: 16px;
   line-height: 1.2;
   color: var(--panel-ink);
-  background: #2B1B11; /* цвет, пока грузится картинка стены */
+  background: #2B1B11; 
 }
 
 h1, h2, h3, p { margin: 0; }

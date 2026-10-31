@@ -1,14 +1,4 @@
-/* ==========================================================================
-   interface.js — связывает HTML со звуком: слушает нажатия и двигает картинку.
 
-   Что здесь происходит:
-     1. ползунки   (input[data-param])       → App.state + звук
-     2. типы волн  (.wave-btn)               → App.state.synthN.wave
-     3. эффекты    (.fx__led)                → вкл/выкл
-     4. секвенсор  (кружки .seq-cell)        → App.state.pattern
-     5. кнопки     (play, mode, reset, mute) → действия
-     6. анимация кадра: подсветка шага, индикаторы уровня, столбики барабанов
-   ========================================================================== */
 (function () {
   'use strict';
 
@@ -20,8 +10,6 @@
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
-  /* ---------- 1. ползунки ---------- */
-
   /** Доля заполнения для CSS (--v): градиент трека зависит от неё */
   function paintSlider(el) {
     const min = Number(el.min);
@@ -32,7 +20,7 @@
   function bindSliders() {
     $$('input[data-param]').forEach((el) => {
       const path = el.dataset.param;
-      el.value = App.getParam(path);                 // стартовое положение из state.js
+      el.value = App.getParam(path);            
       paintSlider(el);
       el.addEventListener('input', () => {
         const value = Number(el.value);
@@ -45,7 +33,7 @@
     $('#tempo-value').textContent = App.state.tempo;
   }
 
-  /* ---------- 2. типы волн ---------- */
+
 
   function bindWaves() {
     $$('.wave-group').forEach((group) => {
@@ -62,7 +50,7 @@
     });
   }
 
-  /* ---------- 3. эффекты ---------- */
+
 
   function bindEffects() {
     $$('.fx').forEach((panel) => {
@@ -82,9 +70,8 @@
     });
   }
 
-  /* ---------- 4. секвенсор ---------- */
 
-  const cells = {};            // cells['s1'][3] — кнопка
+  const cells = {};          
 
   function showCell(track, step) {
     const el = cells[track][step];
@@ -106,7 +93,6 @@
         cells[t.id].push(el);
         showCell(t.id, step);
 
-        /* Клик: выкл → красный → жёлтый → зелёный → выкл */
         el.addEventListener('click', () => {
           const next = (App.state.pattern[t.id][step] + 1) % cfg.CELL_NAMES.length;
           App.state.pattern[t.id][step] = next;
@@ -123,7 +109,6 @@
     });
   }
 
-  /* ---------- 5. кнопки ---------- */
 
   function showPlaying() {
     const on = App.state.playing;
@@ -136,29 +121,28 @@
   }
 
   function bindButtons() {
-    /* Треугольник: играть / остановить */
     $('#btn-play').addEventListener('click', () => {
       seq.toggle();
       showPlaying();
     });
 
-    /* Красный круг: мир ↔ изнанка (переключает js/modes.js) */
+  
     $('#btn-mode').addEventListener('click', () => {
       App.modes.set(App.state.mode === 'world' ? 'upside' : 'world');
     });
 
-    /* Стрелки: сбросить все выбранные кружки. Музыка при этом не останавливается. */
+
     const reset = $('#btn-reset');
     reset.addEventListener('click', () => {
       seq.clear();
       refreshSequencer();
       reset.classList.remove('is-spinning');
-      void reset.offsetWidth;                       // перезапуск анимации, если нажали повторно
+      void reset.offsetWidth;                      
       reset.classList.add('is-spinning');
     });
     reset.addEventListener('animationend', () => reset.classList.remove('is-spinning'));
 
-    /* Динамик: выключить звук */
+  
     const mute = $('#btn-mute');
     mute.addEventListener('click', () => {
       App.state.muted = !App.state.muted;
@@ -167,7 +151,7 @@
       engine.applyParam('master');
     });
 
-    /* Пробел — играть/остановить (удобно при показе) */
+
     document.addEventListener('keydown', (e) => {
       if (e.code !== 'Space' || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
       e.preventDefault();
@@ -175,8 +159,6 @@
       showPlaying();
     });
   }
-
-  /* ---------- 6. анимация кадра ---------- */
 
   let lastStep = -1;
   const meters = {};
@@ -192,7 +174,7 @@
     });
   }
 
-  /** 5 кружков заполняются цветом снизу вверх: сначала нижний, потом выше (--lit 0…1 у каждого) */
+
   function paintMeter(id, level) {
     const dots = meters[id];
     const n = dots.length;
@@ -208,9 +190,7 @@
     void dot.offsetWidth;
     dot.classList.add('is-hit');
   }
-
-  /* Столбики барабанов: у каждого своя случайная высота, к которой он плавно тянется,
-     потом выбирает новую — они просто растут и уменьшаются вразнобой. */
+ 
   const vizTarget = vizBars.map(() => 0.5);
   const vizNext = vizBars.map(() => 0);
 
@@ -229,7 +209,7 @@
     const gap = 3;
     const bw = (w - 16 - gap * (n - 1)) / n;
     const now = performance.now();
-    const range = App.state.playing ? 1 : 0.3;                       // на паузе колеблются слабее
+    const range = App.state.playing ? 1 : 0.3;                      
     g.fillStyle = getComputedStyle($('#drums')).getPropertyValue('--accent').trim() || '#FFD60A';
     for (let i = 0; i < n; i++) {
       if (now > vizNext[i]) {
@@ -245,7 +225,7 @@
   function frame() {
     requestAnimationFrame(frame);
 
-    /* События секвенсора, время которых наступило */
+  
     if (engine.ctx && App.state.playing) {
       seq.consumeDue(engine.ctx.currentTime).forEach((ev) => {
         if (lastStep >= 0) {
@@ -257,18 +237,17 @@
       });
     }
 
-    /* Индикаторы уровня: быстро растут, медленно опускаются */
+  
     Object.keys(meters).forEach((id) => {
       const level = engine.ctx ? engine.getLevel(id) : 0;
       const m = meterLevels[id];
-      meterLevels[id] = m + (level - m) * (level > m ? 0.2 : 0.07);   // плавно наполняется и плавно убывает
+      meterLevels[id] = m + (level - m) * (level > m ? 0.2 : 0.07);  
       paintMeter(id, meterLevels[id]);
     });
 
     drawVisualizer();
   }
 
-  /* Столбики glitch: каждому своя скорость и сдвиг — CSS-анимация идёт вразнобой */
   function scatterGlitch() {
     $$('.fx-art--bar').forEach((bar) => {
       bar.style.setProperty('--dur', (0.45 + Math.random() * 0.9).toFixed(2) + 's');
@@ -276,7 +255,6 @@
     });
   }
 
-  /* ---------- запуск ---------- */
 
   App.ui = {
     init() {

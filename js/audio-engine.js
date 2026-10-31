@@ -15,8 +15,6 @@
   });
 
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-
-  /* Плавно перевести параметр к новому значению (без щелчков) */
   function ramp(param, value, speed) {
     param.setTargetAtTime(value, engine.ctx.currentTime, speed || 0.03);
   }
@@ -52,7 +50,6 @@
       engine.channels[t.channel] = { input, panner, volume, analyser };
     });
 
-    /* --- шина и фильтр низких частот --- */
     engine.bus = ctx.createGain();
     engine.shelf = ctx.createBiquadFilter();
     engine.shelf.type = 'lowshelf';
@@ -60,14 +57,13 @@
     Object.values(engine.channels).forEach((ch) => ch.volume.connect(engine.bus));
     engine.bus.connect(engine.shelf);
 
-    /* --- эффекты по порядку --- */
+   
     let tail = engine.shelf;
     tail = buildDistortion(ctx, tail);
     tail = buildDelay(ctx, tail);
     tail = buildReverb(ctx, tail);
     tail = buildGlitch(ctx, tail);
 
-    /* --- выход: общая громкость → лимитер → колонки --- */
     engine.master = ctx.createGain();
     const limiter = ctx.createDynamicsCompressor();
     limiter.threshold.value = -10;
@@ -80,7 +76,6 @@
     limiter.connect(ctx.destination);
   }
 
-  /* Эффект «сухой + мокрый»: dry — оригинал, wet — обработанный звук. Возвращает выход. */
   function mixStage(ctx, input) {
     const out = ctx.createGain();
     const dry = ctx.createGain();
@@ -91,7 +86,6 @@
     return { out, dry, wet };
   }
 
-  /* DISTORTION: звук пропускается через «изогнутую» кривую — вершины волны срезаются */
   function buildDistortion(ctx, input) {
     const stage = mixStage(ctx, input);
     const pre = ctx.createGain();
@@ -132,7 +126,6 @@
     return stage.out;
   }
 
-  /* REVERB: «комната». ConvolverNode умножает звук на импульс — затухающий шум */
   function buildReverb(ctx, input) {
     const stage = mixStage(ctx, input);
     const convolver = ctx.createConvolver();
@@ -143,7 +136,6 @@
     return stage.out;
   }
 
-  /** Импульс комнаты: шум, который затихает; чем дальше — тем он темнее (как в настоящей комнате) */
   function makeImpulse(ctx, seconds, decay) {
     const rate = ctx.sampleRate;
     const length = Math.floor(rate * seconds);
@@ -161,7 +153,6 @@
     return buffer;
   }
 
-  /* GLITCH: быстрый «рубильник» громкости. Квадратная волна LFO то открывает, то закрывает звук */
   function buildGlitch(ctx, input) {
     const gate = ctx.createGain();
     const lfo = ctx.createOscillator();
@@ -176,9 +167,6 @@
     return gate;
   }
 
-
-
-  /** Сколько эффекта реально звучит: учитывает выключатель и режим мира/изнанки */
   engine.effectiveAmount = function (id) {
     const s = App.state[id];
     if (!s.on) return 0;
