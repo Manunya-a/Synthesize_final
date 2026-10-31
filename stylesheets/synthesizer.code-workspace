@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "synthesizer",
+			"path": "../../../Desktop/synthesizer"
+		},
+		{
+			"name": "js",
+			"path": "../js"
+		},
+		{
+			"name": "stylesheets",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
