@@ -1,46 +1,20 @@
 <!DOCTYPE html>
-<!--
-  index.html — СТРУКТУРА инструмента: что где лежит.
-  Внешний вид:  stylesheets/layout.css
-  Анимации:     stylesheets/animation.css
-  Звук и логика: папка js/ (подключается в самом низу страницы)
-
-  НЕЙМИНГ (одни и те же имена в HTML, CSS и JS):
-  • Источники звука  : synth1, synth2, drums
-  • Каналы           : ch-s1, ch-s2, ch-dr
-  • Эффекты          : fx-distortion, fx-delay, fx-reverb, fx-glitch
-  • Секвенсор (ряды) : seq-row-s1, seq-row-s2, seq-row-dr
-                       (внутри seq-row-dr три ряда: -kick, -snare, -hat)
-  • Кнопки           : btn-play, btn-mode, btn-reset, btn-mute
-  • Классы — по методике BEM: блок__элемент (panel__title, seq-cell, meter__dot)
-  • data-accent="red|yellow|green" — цвет источника; в «Изнанке» все цвета становятся красными
-  • data-param="ch-s1.volume" — «адрес» значения в js/state.js: какой ползунок что меняет
-
-  Путь звука:
-  synth1 → ch-s1 ┐
-  synth2 → ch-s2 ┼→ шина → fx-distortion → fx-delay → fx-reverb → fx-glitch → выход
-  drums  → ch-dr ┘
--->
 <html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Upside Down Synth</title>
+  <title>Two Sides</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
 
-  <link rel="stylesheet" href="stylesheets/layout.css">
-  <link rel="stylesheet" href="stylesheets/animation.css">
+  <link rel="stylesheet" href="stylesheets/style.css">
 </head>
 
-<!-- data-mode: "world" (мир) или "upside" (изнанка). Переключает js/modes.js -->
 <body data-mode="world">
 
 <div class="scene">
-
-  <!-- ===== СЦЕНА: два фона стены, один поверх другого (плавная смена), и эффекты изнанки ===== -->
   <div class="scene__bg scene__bg--world" aria-hidden="true"></div>
   <div class="scene__bg scene__bg--upside" aria-hidden="true"></div>
   <div class="scene__glow" aria-hidden="true"></div>
@@ -48,8 +22,6 @@
   <div class="scene__flash" aria-hidden="true"></div>
 
   <main class="synth">
-
-    <!-- ===== 1. ВЕРХНЯЯ ПАНЕЛЬ: темп и общая громкость ===== -->
     <header class="panel panel--dark transport" id="transport">
       <div class="transport__group transport__group--tempo">
         <label class="transport__name" for="tempo-slider">BPM</label>
@@ -69,10 +41,9 @@
       </div>
     </header>
 
-    <!-- ===== 2. ИСТОЧНИКИ ЗВУКА: synth1, synth2, drums ===== -->
     <div class="row row--sources">
 
-      <!-- synth1: волна + атака, затухание, панорама (панорама относится к каналу ch-s1) -->
+
       <section class="panel voice" id="synth1" data-accent="red" aria-labelledby="synth1-title">
         <header class="panel__header">
           <span class="panel__dot" aria-hidden="true"></span>
@@ -90,8 +61,6 @@
           <input class="slider" type="range" min="0" max="1" step="0.01" data-param="ch-s1.pan"      aria-label="Synth 1: панорама"   title="Панорама — левее или правее">
         </div>
       </section>
-
-      <!-- synth2 -->
       <section class="panel voice" id="synth2" data-accent="green" aria-labelledby="synth2-title">
         <header class="panel__header">
           <span class="panel__dot" aria-hidden="true"></span>
@@ -110,7 +79,7 @@
         </div>
       </section>
 
-      <!-- drums: «экран» с колебаниями и громкость каждого барабана (kick, snare, hat) -->
+      
       <section class="panel voice" id="drums" data-accent="yellow" aria-labelledby="drums-title">
         <header class="panel__header">
           <span class="panel__dot" aria-hidden="true"></span>
@@ -125,8 +94,7 @@
       </section>
     </div>
 
-    <!-- ===== 3. ЦЕПОЧКА ЭФФЕКТОВ: distortion → delay → reverb → glitch =====
-         Лампочка слева — кнопка вкл/выкл. Ползунок — «сколько эффекта». -->
+    
     <div class="row row--effects">
 
       <section class="panel fx" id="fx-distortion" data-accent="red" data-on="true" aria-labelledby="fx-distortion-title">
@@ -135,7 +103,7 @@
           <h2 class="panel__title" id="fx-distortion-title">DISTORTION</h2>
         </header>
         <div class="fx__body">
-          <!-- экран: волна со «срезанными» вершинами -->
+         
           <svg class="fx__display" viewBox="0 0 155 45" aria-hidden="true">
             <path class="fx-art fx-art--wave" d="M0 22 C8 4 23 4 31 22 S54 40 62 22 S85 4 93 22 S116 40 124 22 S147 4 155 22 S178 40 186 22 S209 4 217 22 S240 40 248 22"/>
           </svg>
@@ -149,7 +117,7 @@
           <h2 class="panel__title" id="fx-delay-title">DELAY</h2>
         </header>
         <div class="fx__body">
-          <!-- экран: затухающие повторы эха -->
+        
           <svg class="fx__display" viewBox="0 0 155 45" aria-hidden="true">
             <circle class="fx-art fx-art--echo" style="--i:0" cx="14"  cy="9"  r="4"/>
             <circle class="fx-art fx-art--echo" style="--i:1" cx="36"  cy="17" r="3.5"/>
@@ -167,7 +135,7 @@
           <h2 class="panel__title" id="fx-reverb-title">REVERB</h2>
         </header>
         <div class="fx__body">
-          <!-- экран: россыпь точек — звук «рассеивается» по комнате -->
+        
           <svg class="fx__display" viewBox="0 0 155 45" aria-hidden="true">
             <path class="fx-art fx-art--room" stroke-width="3.4" stroke-linecap="round"
               d="M10 8h.01M26 12h.01M44 7h.01M58 14h.01M74 9h.01M90 13h.01M106 8h.01M122 12h.01M140 9h.01
@@ -184,7 +152,6 @@
           <h2 class="panel__title" id="fx-glitch-title">GLITCH</h2>
         </header>
         <div class="fx__body">
-          <!-- экран: столбики, которые «рвутся» -->
           <svg class="fx__display" viewBox="0 0 155 45" aria-hidden="true">
             <rect class="fx-art fx-art--bar" style="--i:0"  x="6"   y="26" width="3.4" height="14"/>
             <rect class="fx-art fx-art--bar" style="--i:1"  x="13"  y="14" width="3.4" height="26"/>
@@ -212,11 +179,7 @@
         </div>
       </section>
     </div>
-
-    <!-- ===== 4. НИЖНИЙ БЛОК: каналы (микшер) | секвенсор | кнопки управления ===== -->
     <div class="row row--bottom">
-
-      <!-- Каналы: у каждого источника свой фейдер громкости и индикатор уровня (5 кружков) -->
       <div class="mixer">
         <section class="panel panel--dark channel" id="ch-s1" data-accent="red" aria-label="Канал S1">
           <h3 class="channel__title">S1</h3>
@@ -248,32 +211,26 @@
           </div>
         </section>
       </div>
-
-      <!-- Секвенсор: 5 рядов × 16 шагов. Основная мелодия играет сама, кружки только ДОБАВЛЯЮТ звуки сверху.
-           Кружки в ряды добавляет js/interface.js.
-           Клик по кружку меняет цвет по кругу: выкл → красный → жёлтый → зелёный → выкл -->
       <section class="panel panel--dark sequencer" id="sequencer" aria-label="Секвенсор">
         <div class="seq-row" id="seq-row-s1"            data-track="s1"    role="group" aria-label="Synth 1"></div>
         <div class="seq-row" id="seq-row-s2"            data-track="s2"    role="group" aria-label="Synth 2"></div>
-        <!-- seq-row-dr — группа из трёх барабанных рядов (display: contents — на раскладку не влияет) -->
+       
         <div class="seq-group" id="seq-row-dr" role="group" aria-label="Drums">
           <div class="seq-row" id="seq-row-dr-kick"  data-track="kick"  role="group" aria-label="Kick"></div>
           <div class="seq-row" id="seq-row-dr-snare" data-track="snare" role="group" aria-label="Snare"></div>
           <div class="seq-row" id="seq-row-dr-hat"   data-track="hat"   role="group" aria-label="Hat"></div>
         </div>
       </section>
-
-      <!-- Кнопки управления -->
       <aside class="panel panel--dark controls" id="controls" aria-label="Управление">
-        <!-- Треугольник: включает и выключает проигрывание -->
+      
         <button type="button" class="ctrl-btn ctrl-btn--play" id="btn-play" aria-pressed="false" aria-label="Играть / остановить" title="Играть / остановить">
           <svg viewBox="0 0 28 30" width="28" height="30" aria-hidden="true"><path d="M3 2.5v25a1 1 0 0 0 1.5.9l21-12.5a1 1 0 0 0 0-1.8L4.5 1.6A1 1 0 0 0 3 2.5z"/></svg>
         </button>
-        <!-- Красный круг: переключает «мир» и «изнанку» -->
+     
         <button type="button" class="ctrl-btn ctrl-btn--mode" id="btn-mode" aria-pressed="false" aria-label="Перейти в Изнанку" title="Мир / Изнанка">
           <span class="ctrl-btn__circle" aria-hidden="true"></span>
         </button>
-        <!-- Стрелки: сбрасывают все выбранные кружки секвенсора -->
+     
         <button type="button" class="ctrl-btn ctrl-btn--reset" id="btn-reset" aria-label="Сбросить кружки" title="Сбросить кружки">
           <span class="ctrl-btn__icon" aria-hidden="true"></span>
         </button>
@@ -283,8 +240,6 @@
   </main>
 </div>
 
-<!-- Скрипты — обычные (не модули), чтобы страница открывалась двойным кликом без сервера.
-     Порядок важен: каждый следующий файл использует предыдущие. -->
 <script src="js/config.js"></script>
 <script src="js/state.js"></script>
 <script src="js/audio-engine.js"></script>
